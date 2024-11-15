@@ -58,6 +58,8 @@ public class Breakout extends GraphicsProgram {
 
 /** Number of turns */
 	private static final int NTURNS = 3;
+	
+	//TODO Зробити головне меню для рестарту гри / Безух
 
 /* Method: run() */
 /** Runs the Breakout program. */
@@ -73,7 +75,13 @@ public class Breakout extends GraphicsProgram {
 		ballMove();
 	}
 	
-	private GRect platform;
+	// TODO написати метод для створення світу / Анкудович
+	
+	// TODO Додавати javadoc
+	// TODO поменьше використовувати глобалні змінні, краще передавати значення у методах.
+	// Єдині глобальні змінні: платформа?
+	private GRect platform; 
+	
 	
 	public void mouseMoved(MouseEvent e)
 	{
@@ -111,11 +119,20 @@ public class Breakout extends GraphicsProgram {
 	        
 	        checkCollision(ball);
 	        
+	        //TODO реалізувати ускладнення (прискорення) / ?
+	        //TODO звуки
+	        
+	        //TODO реалізувати бали (scoreboard) + життя / ?
+	        
+	        //TODO реалізувати програш / Анкудович
+	        //TODO реалізувати видалення блоку / Анкудович
+	        //TODO реалізувати перевірку на досягнення кінця гри (є змінна кількості блоків, при видаленні блоку --) / Анкудович
+	        
 	        pause(10);
 	    }    	
 	}
 	
-	private void checkCollision(GOval ball)
+	private void checkCollision(GOval ball)//TODO випривати колізію / Безух
 	{
         if (ball.getX() <= 0 || ball.getX() + ball.getWidth() >= WIDTH - 20)
         	speedX = -speedX;
