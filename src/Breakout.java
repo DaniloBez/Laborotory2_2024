@@ -89,9 +89,49 @@ public class Breakout extends GraphicsProgram {
 	 * Ініціалізує об'єкти гри, такі як платформа і м'яч, і починає рух м'яча.
 	 */
 	public void startGame() {
-		createPlatform();
-		// TODO написати метод для створення світу / Анкудович
+
+		setUpWorld();
 		ballMove();
+	}
+	/**
+	 * Ініціалізує ігровий світ, створюючи основні об'єкти.
+	 * Метод відповідає за створення платформи для гри та стіни цеглин,
+	 * Викликається перед початком гри для підготовки середовища.
+	 */
+	private void setUpWorld() {
+		createPlatform();
+		createBrickWall();
+	}
+	/**
+	 * Створює стіну з цеглин для ігрового процесу.
+	 * Метод генерує ряди цеглин із заданими розмірами, кольорами та позиціями.
+	 * Цеглини розташовуються у вигляді прямокутної сітки з відповідними відступами
+	 * та кольорами для кожної пари рядів. Перший рядок враховує спеціальний відступ.
+	 */
+	private void createBrickWall() {
+		for(int i = 0;i< NBRICK_ROWS; ++i) {
+			for(int j =0;j<NBRICKS_PER_ROW;++j) {
+				GRect brick = new GRect(BRICK_WIDTH,BRICK_HEIGHT);
+				brick.setFilled(true);
+				
+				// задаємо кольори для кожного з двох рядів
+				switch(j) {
+				case 0:case 1: brick.setColor(Color.decode("#ee6700")); break;
+				case 2: case 3: brick.setColor(Color.decode("#f6f60f"));break;
+				case 4: case 5: brick.setColor(Color.decode("#70c413"));break;
+				case 6: case 7: brick.setColor(Color.decode("#2b9ad6"));break;
+				case 8:case 9: brick.setColor(Color.decode("#ab3fd4"));break;
+				
+				}	
+				
+				//дадаємо bricks. Перший brick кожного ряду робимо з відступом BRICK_SEP/2
+				if(i == 0)
+					add(brick, BRICK_SEP/2+BRICK_WIDTH*i,BRICK_Y_OFFSET+(j+1)*BRICK_SEP+BRICK_HEIGHT*j);
+				else
+					add(brick, BRICK_SEP/2+i*BRICK_SEP+BRICK_WIDTH*i,BRICK_Y_OFFSET+(j+1)*BRICK_SEP+BRICK_HEIGHT*j);
+			}
+		}
+		
 	}
 
 	/**
@@ -118,14 +158,46 @@ public class Breakout extends GraphicsProgram {
 		GOval ball = createBall();
 		float speed = 5f;
 		double angle = getRandomAngle();
+
+		int bricksLeft = NBRICK_ROWS * NBRICKS_PER_ROW;
+		int totalLifes = 3;
 		
 		speedX = speed * sin(angle);
 		speedY = speed * cos(angle);
     
 		while (true) {
+	        if (totalLifes == 0) {
+	            remove(ball);
+	            break;
+	        }
+	        if (ball.getY() + BALL_RADIUS >= HEIGHT) {
+	            totalLifes--;
+	            if (totalLifes > 0) {
+	                remove(ball);
+	                pause(600); // Затримка для перезапуску м'яча
+	                ball = createBall(); // Створюємо новий м'яч
+	                angle = getRandomAngle();
+	                speedX = speed * sin(angle);
+	                speedY = speed * cos(angle); 
+	            } else {
+	                remove(ball);
+	                break;
+	            }
+	        }
+			// баг: обертання м'яча, коли платформа знаходиться в крайньому положені і м'яч летить рівно вверх
+			// перевіряє колізію м'яча і brick
+			if(checkCollision(ball) != null && checkCollision(ball) != platform) {
+				GObject getBrick = checkCollision(ball);
+				remove(getBrick);
+				bricksLeft--;
+			}
+	        if (bricksLeft == 0) {
+	            remove(ball);
+	            break;
+	        }
 			ball.move(speedX, speedY);
-			checkCollision(ball);
-
+			pause(10);
+			
 			// TODO реалізувати ускладнення (прискорення) / ?
 			// TODO звуки
 			// TODO реалізувати бали (scoreboard) + життя / ?
@@ -133,7 +205,6 @@ public class Breakout extends GraphicsProgram {
 			// TODO реалізувати видалення блоку / Анкудович
 			// TODO реалізувати перевірку на досягнення кінця гри / Анкудович
 
-			pause(10);
 		}
 	}
 
@@ -194,11 +265,11 @@ public class Breakout extends GraphicsProgram {
 
 	/**
 	 * Перевірка на зіткнення м'яча зі стінами і зміна напрямку руху.
-	 * 
+	 * || ball.getY() + 2 * BALL_RADIUS >= HEIGHT - 75
 	 * @param ball М'яч, який перевіряється
 	 */
 	private void checkWallCollision(GOval ball) {
-		if (ball.getY() <= 0 || ball.getY() + 2 * BALL_RADIUS >= HEIGHT - 75)
+		if (ball.getY() <= 0 )
 			speedY = -speedY;
     
 		if (ball.getX() <= 0 || ball.getX() + 2 * BALL_RADIUS >= WIDTH - 20)
