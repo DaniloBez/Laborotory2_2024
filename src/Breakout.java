@@ -174,8 +174,9 @@ public class Breakout extends GraphicsProgram {
 	            totalLifes--;
 	            if (totalLifes > 0) {
 	                remove(ball);
-	                pause(600); // Затримка для перезапуску м'яча
+	                pause(200); 
 	                ball = createBall(); // Створюємо новий м'яч
+	                pause(800); // Затримка для перезапуску м'яча
 	                angle = getRandomAngle();
 	                speedX = speed * sin(angle);
 	                speedY = speed * cos(angle); 
@@ -186,8 +187,8 @@ public class Breakout extends GraphicsProgram {
 	        }
 			// баг: обертання м'яча, коли платформа знаходиться в крайньому положені і м'яч летить рівно вверх
 			// перевіряє колізію м'яча і brick
-			if(checkCollision(ball) != null && checkCollision(ball) != platform) {
-				GObject getBrick = checkCollision(ball);
+	        GObject getBrick = checkCollision(ball);
+			if(getBrick != null && getBrick != platform) {
 				remove(getBrick);
 				bricksLeft--;
 			}
