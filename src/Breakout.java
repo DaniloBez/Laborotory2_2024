@@ -58,18 +58,33 @@ public class Breakout extends GraphicsProgram {
 /** Number of turns */
 	private static final int NTURNS = 3;
 	
-	//TODO Зробити головне меню для рестарту гри / Безух
-
-	/**Об'єкт платформи, якою буде керувати ігрок*/
+	
+	
+	private UI menu;
+	private CollisionChecker collisionChecker;
+	
+	public boolean isGameStarted = false;
 	private GRect platform;
-//    private SoundClip loseBall = new SoundClip("sound/loseBall.wav");
+	
+	public double speedX;
+	public double speedY;
+
+	
+	
 	/**
 	 * Основний метод для запуску програми Breakout.
 	 */
 	public void run() {
-		this.setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
+		this.setSize(APPLICATION_WIDTH + 20, APPLICATION_HEIGHT);
 		addMouseListeners();
-		startGame();
+		
+		menu = new UI(this);
+		menu.startMenu();
+		
+		while(true) {
+			if(isGameStarted)
+				startGame();
+		}
 	}
 
 	/**
@@ -79,19 +94,49 @@ public class Breakout extends GraphicsProgram {
 	 * @param e Об'єкт MouseEvent, який містить інформацію про рух миші
 	 */
 	public void mouseMoved(MouseEvent e) {
-		if (platform != null)
+		if (isGameStarted && platform != null)
 			platform.setLocation(e.getX() - 30, platform.getY());
+	}
+	
+	/**
+	 * Реалізація події mouseClicked для початку гри.
+	 * Реалізація початку гри винесена в клас UI
+	 * 
+	 * @param e Об'єкт MouseEvent, який містить інформацію про рух миші
+	 */
+	public void mouseClicked(MouseEvent e)
+	{
+		if(menu != null)
+			menu.mouseClickedHandler(e);
 	}
 
 	/**
 	 * Метод для запуску гри Breakout.
 	 * Ініціалізує об'єкти гри, такі як платформа і м'яч, і починає рух м'яча.
 	 */
-	public void startGame() {
-
+	private void startGame() {
+		removeAll();
+		
+		isGameStarted = true;
 		setUpWorld();
 		ballMove();
 	}
+	
+	/**
+	 * Метод для закінчення гри.
+	 * @param score Кількість збитих блоків
+	 * @param isWin Чи переміг користувач
+	 */
+	private void stopGame(int score, boolean isWin)
+	{
+		removeAll();
+		isGameStarted = false;
+		
+		menu.restartMenu(score, isWin);
+	}	
+	
+	
+	
 	/**
 	 * Ініціалізує ігровий світ, створюючи основні об'єкти.
 	 * Метод відповідає за створення платформи для гри та стіни цеглин,
@@ -103,67 +148,20 @@ public class Breakout extends GraphicsProgram {
 
 	}
 
-
-	/**
-	 * Оновлює відображення рахунку на екрані. Видаляє попередній напис рахунку, якщо він існує.
 	 *
-	 * @param currentScore   Поточний рахунок, який потрібно відобразити.
-	 * @param previousScore  Об'єкт GLabel, що представляє попередній рахунок, або null, якщо його немає.
 	 * @return Новий об'єкт GLabel, який представляє оновлений рахунок.
 	 */
 	private GLabel setScoreBoard(int currentScore, GLabel previousScore) {
 	    if (previousScore != null) {
-	        remove(previousScore);
-	    }
-	    GLabel score = new GLabel("Рахунок: " + currentScore);
-	    score.setFont("Arial-bold-18");
-	    double scoreX = (WIDTH - score.getWidth()) / 2;
-	    double scoreY = score.getAscent();
-	    score.setLocation(scoreX, scoreY);
-
-	    add(score);
-	    double lineY = scoreY + 5; // Відстань від тексту до лінії
-	    GLine line = new GLine(0, lineY, WIDTH, lineY);
-	    add(line);
-	    return score;
-	}
-
 	/**
-	 * Оновлює відображення кількості життів. Видаляє попередній напис про кількість життів, якщо він існує.
-	 *
-	 * @param lifesLeft      Кількість життів, що залишились.
-	 * @param previousLifes  Об'єкт GLabel, що представляє попередню кількість життів, або null, якщо його немає.
-	 * @return Новий об'єкт GLabel, який представляє оновлену кількість життів.
-	 */
-	private GLabel setLifeCounter(int lifesLeft, GLabel previousLifes) {
-	    if (previousLifes != null) {
-	        remove(previousLifes);
-	    }
-	    GLabel lifes = new GLabel("Життя: " + lifesLeft);
-	    lifes.setFont("Arialc-bold-16");
-	    double lifeX = lifes.getX() + 5;
-	    double lifeY = lifes.getAscent() + 2;
-	    lifes.setLocation(lifeX, lifeY);
-	    add(lifes);
-	    return lifes;
-	}
-
 	/**
-	 * Відображає повідомлення про перемогу або поразку.
-	 *
-	 * @param message  Текст повідомлення, який потрібно відобразити.
-	 * @param status   Статус: 0 — перемога (зелений колір), інше значення — поразка (червоний колір).
+	 * Створення платформи для гри. Платформа розташовується по центру внизу екрана.
 	 */
-	private void displayWinner(String message, int status) {
-	    GLabel label = new GLabel(message);
-	    label.setFont("Arial-bold-36");
-	    label.setColor(status == 0 ? Color.GREEN : Color.RED);
-	    double x = (getWidth() - label.getWidth()) / 2;
-	    double y = (getHeight() + label.getAscent()) / 2;
-	    label.setLocation(x, y);
-	    add(label);
+	private void createPlatform() {
+		platform = new GRect(WIDTH / 2 - 30, HEIGHT - 125, 60, 5);
+		platform.setFilled(true);
+		add(platform);
 	}
-
 
 	/**
 	 * Створює стіну з цеглин для ігрового процесу.
@@ -177,15 +175,7 @@ public class Breakout extends GraphicsProgram {
 				GRect brick = new GRect(BRICK_WIDTH,BRICK_HEIGHT);
 				brick.setFilled(true);
 				
-				// задаємо кольори для кожного з двох рядів
-				switch(j) {
-				case 0:case 1: brick.setColor(Color.decode("#ee6700")); break;
-				case 2: case 3: brick.setColor(Color.decode("#f6f60f"));break;
-				case 4: case 5: brick.setColor(Color.decode("#70c413"));break;
-				case 6: case 7: brick.setColor(Color.decode("#2b9ad6"));break;
-				case 8:case 9: brick.setColor(Color.decode("#ab3fd4"));break;
-				
-				}	
+				brick.setColor(getBrickColor(j));	
 				
 				//дадаємо bricks. Перший brick кожного ряду робимо з відступом BRICK_SEP/2
 				if(i == 0)
@@ -196,85 +186,36 @@ public class Breakout extends GraphicsProgram {
 		}
 		
 	}
-
-	/**
-	 * Створення платформи для гри. Платформа розташовується по центру внизу екрана.
-	 */
-	private void createPlatform() {
-		platform = new GRect(WIDTH / 2 - 30, HEIGHT - 125, 60, 5);
-		platform.setFilled(true);
-		add(platform);
-	}
-	
-	/**X складова швидкості*/
-	private double speedX;
-	/**Y складова швидкості*/
-	private double speedY;
 	
 	/**
-	 * Основний метод для керування рухом м'яча.
-	 * М'яч рухається постійно, змінюючи напрямок при зіткненні зі стінами або іншими об'єктами.
-	 * 
-	 * Кожна пауза в циклі відповідає одному кадру анімації.
+	 * Повертає колів в залежності від індексу
+	 * @param index Номер рядка
+	 * @return Колір
 	 */
-	private void ballMove() {
-	    GOval ball = createBall();
-	    float speed = 5f;
-	    double angle = getRandomAngle();
-
-	    GLabel previousScore = setScoreBoard(0, null);
-	    GLabel previousLifes = setLifeCounter(3, null);
-
-	    int currentScore = 0;
-	    int maxScore = NBRICK_ROWS * NBRICKS_PER_ROW;
-	    int totalLifes = 3;
-
-	    speedX = speed * sin(angle);
-	    speedY = speed * cos(angle);
-
-	    while (true) {
-	        // Перевірка умов завершення гри
-	        if (totalLifes == 0 || currentScore == maxScore) {
-	            remove(ball);
-	            removeAll(); // Очищення екрана перед відображенням результату
-	            if (totalLifes == 0) {
-	                displayWinner("Ви програли", 1);
-	            } else if (currentScore == maxScore) {
-	                displayWinner("Ви перемогли!", 0);
-	            }
-	            break;
-	        }
-
-	        // Перевірка падіння м'яча за нижній край
-	        if (ball.getY() + BALL_RADIUS >= HEIGHT) {
-	            totalLifes--;
-	            previousLifes = setLifeCounter(totalLifes, previousLifes);
-	            if (totalLifes > 0) {
-	                remove(ball);
-	                pause(200);
-	                ball = createBall(); // Створюємо новий м'яч
-	                pause(800);
-	                angle = getRandomAngle();
-	                speedX = speed * sin(angle);
-	                speedY = speed * cos(angle);
-	            }
-	        }
-
-	        // Перевірка зіткнення з цеглою
-	        GObject getBrick = checkCollision(ball);
-	        if (getBrick != null && getBrick != platform && !(getBrick instanceof GLine)) {
-	            remove(getBrick);
-	            currentScore++;
-	            previousScore = setScoreBoard(currentScore, previousScore);
-	            pause(10);
-	        }
-
-	        // Рух м'яча
-	        ball.move(speedX, speedY);
-	        pause(10);
-	    }
+	private Color getBrickColor(int index)
+	{
+		Color color = null;
+		
+		switch(index) {
+			case 0: case 1: 
+				color = Color.decode("#ee6700"); 
+				break;
+			case 2: case 3: 
+				color = Color.decode("#f6f60f");
+				break;
+			case 4: case 5: 
+				color = Color.decode("#70c413");
+				break;
+			case 6: case 7: 
+				color = Color.decode("#2b9ad6");
+				break;
+			case 8:case 9: 
+				color = Color.decode("#ab3fd4");
+				break;	
+		}
+		
+		return color;
 	}
-
 
 	/**
 	 * Створює м'яч для гри з початковим розташуванням по центру екрана.
@@ -290,106 +231,7 @@ public class Breakout extends GraphicsProgram {
 		return ball;
 	}
 
-	/**
-	 * Перевірка на всі можливі колізії м'яча з об'єктами, стінами або якщо м'яч застряг.
-	 * 
-	 * @param ball М'яч, який перевіряється на колізії
-	 * @return Об'єкт, з яким сталося зіткнення, або null, якщо зіткнення немає
-	 */
-	private GObject checkCollision(GOval ball) {
-		if (isBallStuck(ball))
-			return null;
-    
-		GObject obj = checkObjectCollision(ball);
-		if (obj != null)
-			return obj;
-
-		checkWallCollision(ball);
-		return null;
-	}
-
-	/**
-	 * Перевіряє, чи м'яч застряг в об'єкті.
-	 * Якщо застряг, змінює напрямок руху і "витягує" м'яч.
-	 * 
-	 * @param ball М'яч, який перевіряється
-	 * @return true, якщо м'яч застряг; false в іншому випадку
-	 */
-	private boolean isBallStuck(GOval ball) {
-		double x = ball.getX(), y = ball.getY();
-		ball.setLocation(-100, -100);
-		GObject object = this.getElementAt(x + BALL_RADIUS, y + BALL_RADIUS);
-		ball.setLocation(x, y);
-    
-		if (object != null) {            
-			speedY = -Math.abs(speedY);
-			speedX = -speedX;
-			ball.setLocation(x + speedX, HEIGHT - 130 - 2 * BALL_RADIUS);
-			return true;
-		}
-    
-		return false;
-	}
-
-	/**
-	 * Перевірка на зіткнення м'яча зі стінами і зміна напрямку руху.
-	 * || ball.getY() + 2 * BALL_RADIUS >= HEIGHT - 75
-	 * @param ball М'яч, який перевіряється
-	 */
-	private void checkWallCollision(GOval ball) {
-		if (ball.getY() <= 0 )
-			speedY = -speedY;
-    
-		if (ball.getX() <= 0 || ball.getX() + 2 * BALL_RADIUS >= WIDTH - 20)
-			speedX = -speedX;
-	}
-
-	/**
-	 * Перевіряє, чи м'яч зіткнувся з об'єктом і змінює напрямок руху.
-	 * 
-	 * @param ball М'яч, який перевіряється
-	 * @return Об'єкт, з яким сталося зіткнення, або null, якщо зіткнення немає
-	 */
-	private GObject checkObjectCollision(GOval ball) {    
-		double x = ball.getX();
-		double y = ball.getY();
-		double diameter = 2 * BALL_RADIUS;
-    
-		GObject object;
-
-    
-		// Перевірка верхньої і нижньої сторони
-		for (double i = x; i < x + diameter; i++) {
-			object = getElementAt(i, y - 1);
-			if (object != null) {
-				speedY = -speedY;
-				return object;
-			}
-
-			object = getElementAt(i, y + diameter + 1);
-			if (object != null) {
-				speedY = -speedY;
-				return object;
-			}
-		}
-
-		// Перевірка лівої і правої сторони
-		for (double i = y; i < y + diameter; i++) {
-			object = getElementAt(x - 1, i);
-			if (object != null) {
-				speedX = -speedX;
-				return object;
-			}
-
-			object = getElementAt(x + diameter + 1, i);
-			if (object != null) {
-				speedX = -speedX;
-				return object;
-			}
-		}
-
-		return null;
-	}
+	
 
 	/**
 	 * Знаходить випадковий кут для початкового руху м'яча.
@@ -407,4 +249,75 @@ public class Breakout extends GraphicsProgram {
     
 		return toRadians(angle);
 	}
+	
+
+	
+	/**
+	 * Основний метод для керування рухом м'яча.
+	 * М'яч рухається постійно, змінюючи напрямок при зіткненні зі стінами або іншими об'єктами.
+	 * 
+	 * Кожна пауза в циклі відповідає одному кадру анімації.
+	 */
+	private void ballMove() {
+		GOval ball = createBall();
+	    float speed = 5f;
+	    double angle = getRandomAngle();
+	    
+	    GLabel previousScore = menu.setScoreBoard(0, null);
+	    GLabel previousLifes = menu.setLifeCounter(3, null);
+
+	    int currentScore = 0;
+	    int maxScore = NBRICK_ROWS * NBRICKS_PER_ROW;
+	    int totalLifes = NTURNS;
+
+	    speedX = speed * sin(angle);
+	    speedY = speed * cos(angle);
+	    
+		pause(800);
+	    while (true) {
+	    	
+	        // Перевірка умов завершення гри
+	        if (totalLifes == 0 || currentScore == maxScore) {
+	            removeAll();
+	            if (totalLifes == 0) 
+	            	stopGame(currentScore, false);
+	            else if (currentScore == maxScore) 
+	            	stopGame(currentScore, true);
+	            
+	            break;
+	        }
+	        
+	     // Перевірка падіння м'яча за нижній край
+	        if (ball.getY() + BALL_RADIUS >= HEIGHT) {
+	            totalLifes--;
+	            previousLifes = menu.setLifeCounter(totalLifes, previousLifes);
+	            if (totalLifes > 0) {
+	                remove(ball);
+	                pause(200);
+	                ball = createBall();
+	                pause(800);
+	                angle = getRandomAngle();
+	                speedX = speed * sin(angle);
+	                speedY = speed * cos(angle);
+	            }
+	        }
+	  
+	        // Перевірка зіткнення з цеглою
+	        GObject getBrick = collisionChecker.check(ball);
+	        if (getBrick != null && getBrick != platform && !(getBrick instanceof GLine)) {
+	            remove(getBrick);
+	            currentScore++;
+	            previousScore = menu.setScoreBoard(currentScore, previousScore);
+	            pause(10);
+	        }
+	        
+	        ball.move(speedX, speedY);
+	        pause(10);
+	    }
+	}
+	
+
+
+
+
 }
