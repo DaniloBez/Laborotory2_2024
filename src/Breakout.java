@@ -68,7 +68,10 @@ public class Breakout extends GraphicsProgram {
 	
 	public double speedX;
 	public double speedY;
-
+	private SoundClip loseBall = new SoundClip("sounds/loosingBall.wav");
+	private SoundClip loseGame = new SoundClip("sounds/loseGame.wav");
+	private SoundClip victory = new SoundClip("sounds/victory.wav");
+	private SoundClip hit = new SoundClip("sounds/hitbrick.wav");
 	
 	
 	/**
@@ -278,11 +281,18 @@ public class Breakout extends GraphicsProgram {
 	        // Перевірка умов завершення гри
 	        if (totalLifes == 0 || currentScore == maxScore) {
 	            removeAll();
-	            if (totalLifes == 0) 
+	            if (totalLifes == 0) {
 	            	stopGame(currentScore, false);
-	            else if (currentScore == maxScore) 
+					loseGame.setVolume(0.2);
+					loseGame.play();
+	            }
+
+	            else if (currentScore == maxScore) {
 	            	stopGame(currentScore, true);
-	            
+					victory.setVolume(0.2);
+					victory.play();
+	            }
+            
 	            break;
 	        }
 	        
@@ -291,11 +301,13 @@ public class Breakout extends GraphicsProgram {
 	            totalLifes--;
 	            previousLifes = menu.setLifeCounter(totalLifes, previousLifes);
 	            if (totalLifes > 0) {
+					loseBall.setVolume(0.2);
+					loseBall.play();
+	                angle = getRandomAngle();
 	                remove(ball);
 	                pause(200);
 	                ball = createBall();
 	                pause(800);
-	                angle = getRandomAngle();
 	                speedX = speed * sin(angle);
 	                speedY = speed * cos(angle);
 	            }
@@ -304,9 +316,8 @@ public class Breakout extends GraphicsProgram {
 	        // Перевірка зіткнення з цеглою
 	        GObject getBrick = collisionChecker.check(ball);
 	        if (getBrick != null && getBrick != platform && !(getBrick instanceof GLine)) {
-	            remove(getBrick);
 	            currentScore++;
-	            previousScore = menu.setScoreBoard(currentScore, previousScore);
+	            previousScore = removeBrickAndResetScore(getBrick, previousScore, currentScore);
 	            pause(10);
 	        }
 	        
@@ -314,9 +325,14 @@ public class Breakout extends GraphicsProgram {
 	        pause(10);
 	    }
 	}
-	
 
-
-
+	private GLabel removeBrickAndResetScore(GObject getBrick, GLabel previousScore, int currentScore) {
+		hit.setVolume(1);
+		hit.play();
+        remove(getBrick);
+        return menu.setScoreBoard(currentScore, previousScore);
+        
+		
+	}
 
 }

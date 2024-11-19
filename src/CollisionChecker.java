@@ -54,7 +54,6 @@ public class CollisionChecker {
 
 	/**
 	 * Перевірка на зіткнення м'яча зі стінами і зміна напрямку руху.
-	 * || ball.getY() + 2 * BALL_RADIUS >= HEIGHT - 75
 	 * @param ball М'яч, який перевіряється
 	 */
 	private void checkWallCollision(GOval ball) {
