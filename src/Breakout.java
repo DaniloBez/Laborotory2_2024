@@ -23,7 +23,7 @@ public class Breakout extends GraphicsProgram {
 	public static final int APPLICATION_HEIGHT = 600;
 
 /** Dimensions of game board (usually the same) */
-	private static final int WIDTH = APPLICATION_WIDTH;
+	public static final int WIDTH = APPLICATION_WIDTH;
 	private static final int HEIGHT = APPLICATION_HEIGHT;
 
 /** Dimensions of the paddle */
@@ -81,6 +81,8 @@ public class Breakout extends GraphicsProgram {
 		menu = new UI(this);
 		menu.startMenu();
 		
+		collisionChecker = new CollisionChecker(this);
+		
 		while(true) {
 			if(isGameStarted)
 				startGame();
@@ -109,6 +111,8 @@ public class Breakout extends GraphicsProgram {
 		if(menu != null)
 			menu.mouseClickedHandler(e);
 	}
+	
+	
 
 	/**
 	 * Метод для запуску гри Breakout.
@@ -118,6 +122,7 @@ public class Breakout extends GraphicsProgram {
 		removeAll();
 		
 		isGameStarted = true;
+		
 		setUpWorld();
 		ballMove();
 	}
@@ -148,12 +153,6 @@ public class Breakout extends GraphicsProgram {
 
 	}
 
-	 *
-	 * @return Новий об'єкт GLabel, який представляє оновлений рахунок.
-	 */
-	private GLabel setScoreBoard(int currentScore, GLabel previousScore) {
-	    if (previousScore != null) {
-	/**
 	/**
 	 * Створення платформи для гри. Платформа розташовується по центру внизу екрана.
 	 */
