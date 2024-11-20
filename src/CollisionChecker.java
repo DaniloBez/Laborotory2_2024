@@ -5,10 +5,12 @@ import acm.graphics.GOval;
 public class CollisionChecker {
 
 	private Breakout main;
-	
+	private AudioPlayer hitPlayer = new AudioPlayer();
+		
 	public CollisionChecker(Breakout main)
 	{
 		this.main = main;
+		hitPlayer.loadAudio("src\\sound\\hit.wav");
 	}
 	
 	/**
@@ -46,6 +48,7 @@ public class CollisionChecker {
 			main.speedY = -Math.abs(main.speedY);
 			main.speedX = -main.speedX;
 			ball.setLocation(x + main.speedX, ball.getHeight() / 2 - 130 - ball.getHeight());
+			hitPlayer.playAudio();
 			return true;
 		}
     
@@ -57,11 +60,15 @@ public class CollisionChecker {
 	 * @param ball М'яч, який перевіряється
 	 */
 	private void checkWallCollision(GOval ball) {
-		if (ball.getY() <= 0 )
+		if (ball.getY() <= 0 ) {
 			main.speedY = -main.speedY;
+			hitPlayer.playAudio();
+		}
     
-		if (ball.getX() <= 0 || ball.getX() + 2 * ball.getHeight() / 2 >= main.WIDTH)
+		if (ball.getX() <= 0 || ball.getX() + 2 * ball.getHeight() / 2 >= main.WIDTH) {
 			main.speedX = -main.speedX;
+			hitPlayer.playAudio();
+		}
 	}
 
 	/**
@@ -83,12 +90,14 @@ public class CollisionChecker {
 			object = main.getElementAt(i, y - 1);
 			if (object != null) {
 				main.speedY = -main.speedY;
+				hitPlayer.playAudio();
 				return object;
 			}
 
 			object = main.getElementAt(i, y + diameter + 1);
 			if (object != null) {
 				main.speedY = -main.speedY;
+				hitPlayer.playAudio();
 				return object;
 			}
 		}
@@ -98,12 +107,14 @@ public class CollisionChecker {
 			object = main.getElementAt(x - 1, i);
 			if (object != null) {
 				main.speedX = -main.speedX;
+				hitPlayer.playAudio();
 				return object;
 			}
 
 			object = main.getElementAt(x + diameter + 1, i);
 			if (object != null) {
 				main.speedX = -main.speedX;
+				hitPlayer.playAudio();
 				return object;
 			}
 		}

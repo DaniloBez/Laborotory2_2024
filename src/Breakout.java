@@ -14,6 +14,9 @@ import acm.util.*;
 import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
+
+import javax.sound.sampled.Clip;
+
 import static java.lang.Math.*;
 
 public class Breakout extends GraphicsProgram {
@@ -58,8 +61,11 @@ public class Breakout extends GraphicsProgram {
 /** Number of turns */
 	private static final int NTURNS = 3;
 	
+	/*AudioClip clip = MediaTools.loadAudioClip("sound\\hitting.wav");
+	clip.play(); - Непрацює*/
 	
-	
+	AudioPlayer ballPlayer = new AudioPlayer();
+
 	private UI menu;
 	private CollisionChecker collisionChecker;
 	
@@ -68,16 +74,15 @@ public class Breakout extends GraphicsProgram {
 	
 	public double speedX;
 	public double speedY;
-	private SoundClip loseBall = new SoundClip("sounds/loosingBall.wav");
-	private SoundClip loseGame = new SoundClip("sounds/loseGame.wav");
-	private SoundClip victory = new SoundClip("sounds/victory.wav");
-	private SoundClip hit = new SoundClip("sounds/hitbrick.wav");
+
+	private double delay = 10;
 	
 	
 	/**
 	 * Основний метод для запуску програми Breakout.
 	 */
 	public void run() {
+		ballPlayer.loadAudio("src\\sound\\ball.wav");
 		this.setSize(APPLICATION_WIDTH + 20, APPLICATION_HEIGHT);
 		addMouseListeners();
 		
@@ -283,14 +288,10 @@ public class Breakout extends GraphicsProgram {
 	            removeAll();
 	            if (totalLifes == 0) {
 	            	stopGame(currentScore, false);
-					loseGame.setVolume(0.2);
-					loseGame.play();
 	            }
 
 	            else if (currentScore == maxScore) {
 	            	stopGame(currentScore, true);
-					victory.setVolume(0.2);
-					victory.play();
 	            }
             
 	            break;
@@ -298,11 +299,11 @@ public class Breakout extends GraphicsProgram {
 	        
 	     // Перевірка падіння м'яча за нижній край
 	        if (ball.getY() + BALL_RADIUS >= HEIGHT) {
+	        	ballPlayer.playAudio();
+	        	delay = 10;
 	            totalLifes--;
 	            previousLifes = menu.setLifeCounter(totalLifes, previousLifes);
 	            if (totalLifes > 0) {
-					loseBall.setVolume(0.2);
-					loseBall.play();
 	                angle = getRandomAngle();
 	                remove(ball);
 	                pause(200);
@@ -316,23 +317,16 @@ public class Breakout extends GraphicsProgram {
 	        // Перевірка зіткнення з цеглою
 	        GObject getBrick = collisionChecker.check(ball);
 	        if (getBrick != null && getBrick != platform && !(getBrick instanceof GLine)) {
+	        	remove(getBrick);
 	            currentScore++;
-	            previousScore = removeBrickAndResetScore(getBrick, previousScore, currentScore);
-	            pause(10);
+	            previousScore = menu.setScoreBoard(currentScore, previousScore);
+	            pause(delay);
+	            delay -= 0.02;
 	        }
 	        
 	        ball.move(speedX, speedY);
-	        pause(10);
+	        pause(delay);
 	    }
-	}
-
-	private GLabel removeBrickAndResetScore(GObject getBrick, GLabel previousScore, int currentScore) {
-		hit.setVolume(1);
-		hit.play();
-        remove(getBrick);
-        return menu.setScoreBoard(currentScore, previousScore);
-        
-		
 	}
 
 }

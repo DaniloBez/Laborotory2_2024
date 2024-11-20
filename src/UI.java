@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 
+import acm.graphics.GImage;
 import acm.graphics.GLabel;
 import acm.graphics.GLine;
 import acm.graphics.GRect;
@@ -11,6 +12,7 @@ public class UI {
 	private Breakout main;
 	private double width, height;
 	private GRect startButton;
+	private AudioPlayer player = new AudioPlayer();
 	
 	public UI(Breakout main) {
 		this.main = main;
@@ -34,12 +36,11 @@ public class UI {
 	 */
     public void startMenu() {
     	GCompound menu = new GCompound();
-    	
-        GImage background = new GImage("img//background.gif");
-        
-        background.setSize(main.getWidth(), main.getHeight());
-        
-        main.add(background, 0, 0);
+
+    	GImage back = new GImage("src\\image\\back.gif");
+    	back.setLocation(0, -25);
+    	back.setSize(width, height + 25);
+    	menu.add(back);
 
         // Створення тексту заголовка
         GLabel title = new GLabel("Лабораторна робота №2, гра Breakout");
@@ -87,13 +88,19 @@ public class UI {
      * @param isWin Чи переміг гравець
      */
     public void restartMenu(int score, boolean isWin) {
+    	
+    	if(isWin) 
+    		player.loadAudio("src\\sound\\win.wav");
+    	else
+    		player.loadAudio("src\\sound\\lose.wav");
+    	
+    	player.playAudio();
 
     	GCompound menu = new GCompound();
-        GImage background = new GImage("img//losingBackground.gif");
-        
-        background.setSize(main.getWidth(), main.getHeight());
-        
-        main.add(background, 0, 0);
+    	GImage back = new GImage("src\\image\\back.gif");
+    	back.setLocation(0, -25);
+    	back.setSize(width, height + 25);
+    	menu.add(back);
 
         // Створення заголовка залежно від результату гри
         String resultText = isWin ? "Ви виграли!" : "Ви програли!";
