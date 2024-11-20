@@ -6,6 +6,7 @@ import acm.graphics.GLabel;
 import acm.graphics.GLine;
 import acm.graphics.GRect;
 import acm.graphics.GCompound;
+import acm.graphics.GImage;
 
 public class UI {
 	private Breakout main;
@@ -24,18 +25,18 @@ public class UI {
 	 * @param e Об'єкт MouseEvent, який містить інформацію про рух миші
 	 */
 	public void mouseClickedHandler(MouseEvent e)
-	{
-		if(!main.isGameStarted && startButton != null) {
-			main.isGameStarted = true;
-		}
-	}
+    {
+        if(!main.isGameStarted && startButton != null && startButton.contains(e.getX(), e.getY())) {
+            main.isGameStarted = true;
+        }
+    }
 	
 	/**
 	 * Метод для малювання початкового екрану
 	 */
     public void startMenu() {
     	GCompound menu = new GCompound();
-    	
+
     	GImage back = new GImage("src\\image\\back.gif");
     	back.setLocation(0, -25);
     	back.setSize(width, height + 25);
@@ -44,6 +45,7 @@ public class UI {
         // Створення тексту заголовка
         GLabel title = new GLabel("Лабораторна робота №2, гра Breakout");
         title.setFont("SansSerif-bold-18");
+        title.setColor(Color.white);
         double titleX = (width - title.getWidth()) / 2;
         double titleY = height / 4;
         title.setLocation(titleX, titleY);
@@ -58,7 +60,7 @@ public class UI {
         
     	startButton = new GRect(150, 50);
         startButton.setFilled(true);
-        startButton.setFillColor(Color.LIGHT_GRAY);        
+        startButton.setFillColor(Color.WHITE);        
         startButton.setLocation(buttonX, buttonY);
         menu.add(startButton);
         
@@ -70,6 +72,7 @@ public class UI {
 
         // Додавання авторства внизу праворуч
         GLabel authors = new GLabel("Гру створили\nБезух Данило та Анкудович Григорій");
+        authors.setColor(Color.white);
         authors.setFont("SansSerif-12");
         double authorsX = width - authors.getWidth() - 10;
         double authorsY = height - 20;
@@ -94,7 +97,6 @@ public class UI {
     	player.playAudio();
 
     	GCompound menu = new GCompound();
-    	
     	GImage back = new GImage("src\\image\\back.gif");
     	back.setLocation(0, -25);
     	back.setSize(width, height + 25);
@@ -104,6 +106,7 @@ public class UI {
         String resultText = isWin ? "Ви виграли!" : "Ви програли!";
         GLabel resultLabel = new GLabel(resultText + " Ваші бали: " + score);
         resultLabel.setFont("SansSerif-bold-18");
+        resultLabel.setColor(Color.white);
         double resultX = (width - resultLabel.getWidth()) / 2;
         double resultY = height / 4;
         resultLabel.setLocation(resultX, resultY);
@@ -119,7 +122,7 @@ public class UI {
         
     	startButton = new GRect(150, 50);
         startButton.setFilled(true);
-        startButton.setFillColor(Color.LIGHT_GRAY);        
+        startButton.setFillColor(Color.WHITE);        
         startButton.setLocation(buttonX, buttonY);
         menu.add(startButton);
         

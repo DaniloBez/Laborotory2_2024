@@ -74,9 +74,8 @@ public class Breakout extends GraphicsProgram {
 	
 	public double speedX;
 	public double speedY;
-	
-	private double delay = 10;
 
+	private double delay = 10;
 	
 	
 	/**
@@ -287,11 +286,14 @@ public class Breakout extends GraphicsProgram {
 	        // Перевірка умов завершення гри
 	        if (totalLifes == 0 || currentScore == maxScore) {
 	            removeAll();
-	            if (totalLifes == 0) 
+	            if (totalLifes == 0) {
 	            	stopGame(currentScore, false);
-	            else if (currentScore == maxScore) 
+	            }
+
+	            else if (currentScore == maxScore) {
 	            	stopGame(currentScore, true);
-	            
+	            }
+            
 	            break;
 	        }
 	        
@@ -302,11 +304,11 @@ public class Breakout extends GraphicsProgram {
 	            totalLifes--;
 	            previousLifes = menu.setLifeCounter(totalLifes, previousLifes);
 	            if (totalLifes > 0) {
+	                angle = getRandomAngle();
 	                remove(ball);
 	                pause(200);
 	                ball = createBall();
 	                pause(800);
-	                angle = getRandomAngle();
 	                speedX = speed * sin(angle);
 	                speedY = speed * cos(angle);
 	            }
@@ -315,7 +317,7 @@ public class Breakout extends GraphicsProgram {
 	        // Перевірка зіткнення з цеглою
 	        GObject getBrick = collisionChecker.check(ball);
 	        if (getBrick != null && getBrick != platform && !(getBrick instanceof GLine)) {
-	            remove(getBrick);
+	        	remove(getBrick);
 	            currentScore++;
 	            previousScore = menu.setScoreBoard(currentScore, previousScore);
 	            pause(delay);
@@ -326,9 +328,5 @@ public class Breakout extends GraphicsProgram {
 	        pause(delay);
 	    }
 	}
-	
-
-
-
 
 }
