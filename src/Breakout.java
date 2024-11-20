@@ -14,6 +14,9 @@ import acm.util.*;
 import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
+
+import javax.sound.sampled.Clip;
+
 import static java.lang.Math.*;
 
 public class Breakout extends GraphicsProgram {
@@ -58,8 +61,11 @@ public class Breakout extends GraphicsProgram {
 /** Number of turns */
 	private static final int NTURNS = 3;
 	
+	/*AudioClip clip = MediaTools.loadAudioClip("sound\\hitting.wav");
+	clip.play(); - Непрацює*/
 	
-	
+	AudioPlayer ballPlayer = new AudioPlayer();
+
 	private UI menu;
 	private CollisionChecker collisionChecker;
 	
@@ -68,6 +74,8 @@ public class Breakout extends GraphicsProgram {
 	
 	public double speedX;
 	public double speedY;
+	
+	private double delay = 10;
 
 	
 	
@@ -75,6 +83,7 @@ public class Breakout extends GraphicsProgram {
 	 * Основний метод для запуску програми Breakout.
 	 */
 	public void run() {
+		ballPlayer.loadAudio("src\\sound\\ball.wav");
 		this.setSize(APPLICATION_WIDTH + 20, APPLICATION_HEIGHT);
 		addMouseListeners();
 		
@@ -288,6 +297,8 @@ public class Breakout extends GraphicsProgram {
 	        
 	     // Перевірка падіння м'яча за нижній край
 	        if (ball.getY() + BALL_RADIUS >= HEIGHT) {
+	        	ballPlayer.playAudio();
+	        	delay = 10;
 	            totalLifes--;
 	            previousLifes = menu.setLifeCounter(totalLifes, previousLifes);
 	            if (totalLifes > 0) {
@@ -307,11 +318,12 @@ public class Breakout extends GraphicsProgram {
 	            remove(getBrick);
 	            currentScore++;
 	            previousScore = menu.setScoreBoard(currentScore, previousScore);
-	            pause(10);
+	            pause(delay);
+	            delay -= 0.02;
 	        }
 	        
 	        ball.move(speedX, speedY);
-	        pause(10);
+	        pause(delay);
 	    }
 	}
 	
