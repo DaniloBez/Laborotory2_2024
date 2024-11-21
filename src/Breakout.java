@@ -61,7 +61,7 @@ public class Breakout extends GraphicsProgram {
 /** Number of turns */
 	private static final int NTURNS = 3;
 	
-	/*AudioClip clip = MediaTools.loadAudioClip("sound\\hitting.wav");
+	/*AudioClip clip = MediaTools.loadAudioClip("src\\sound\\hitting.wav");
 	clip.play(); - Непрацює*/
 	
 	AudioPlayer ballPlayer = new AudioPlayer();
@@ -71,6 +71,8 @@ public class Breakout extends GraphicsProgram {
 	
 	public boolean isGameStarted = false;
 	private GRect platform;
+	
+	RandomGenerator random; 
 	
 	public double speedX;
 	public double speedY;
@@ -90,6 +92,8 @@ public class Breakout extends GraphicsProgram {
 		menu.startMenu();
 		
 		collisionChecker = new CollisionChecker(this);
+		
+		random = RandomGenerator.getInstance();
 		
 		while(true) {
 			if(isGameStarted)
@@ -158,7 +162,6 @@ public class Breakout extends GraphicsProgram {
 	private void setUpWorld() {
 		createPlatform();
 		createBrickWall();
-
 	}
 
 	/**
@@ -247,7 +250,6 @@ public class Breakout extends GraphicsProgram {
 	 * @return Кут у радіанах
 	 */
 	private double getRandomAngle() {
-		RandomGenerator random = RandomGenerator.getInstance();
 		double angle;
 		if (random.nextBoolean())
 			angle = 2 + random.nextInt(45);
@@ -321,7 +323,7 @@ public class Breakout extends GraphicsProgram {
 	            currentScore++;
 	            previousScore = menu.setScoreBoard(currentScore, previousScore);
 	            pause(delay);
-	            delay -= 0.02;
+	            delay -= 0.01;
 	        }
 	        
 	        ball.move(speedX, speedY);

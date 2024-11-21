@@ -6,7 +6,6 @@ import acm.graphics.GLabel;
 import acm.graphics.GLine;
 import acm.graphics.GRect;
 import acm.graphics.GCompound;
-import acm.graphics.GImage;
 
 public class UI {
 	private Breakout main;

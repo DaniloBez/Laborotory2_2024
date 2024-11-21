@@ -22,12 +22,13 @@ public class CollisionChecker {
 	public GObject check(GOval ball) {
 		if (isBallStuck(ball))
 			return null;
+		
+		checkWallCollision(ball);
     
 		GObject obj = checkObjectCollision(ball);
 		if (obj != null)
 			return obj;
-
-		checkWallCollision(ball);
+		
 		return null;
 	}
 
@@ -60,7 +61,7 @@ public class CollisionChecker {
 	 * @param ball М'яч, який перевіряється
 	 */
 	private void checkWallCollision(GOval ball) {
-		if (ball.getY() <= 0 ) {
+		if (ball.getY() <= 7 ) {
 			main.speedY = -main.speedY;
 			hitPlayer.playAudio();
 		}
